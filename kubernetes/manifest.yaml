@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment # Fixed from "Deploy" to "Deployment"
+metadata:
+  name: nginx-deploy
+  labels:
+    app: nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 1 # Ensure at least one replica is defined
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25.4-alpine # Pin version
+        ports:
+        - containerPort: 80
+        resources: # Add resource requests and limits
+          requests:
+            cpu: "200m" # 0.2 CPU cores
+            memory: "128Mi" # 128 Mebibytes
+          limits:
+            cpu: "500m" # 0.5 CPU cores
+            memory: "256Mi" # 256 Mebibytes
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+  type: ClusterIP
